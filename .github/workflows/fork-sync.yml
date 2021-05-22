@@ -1,14 +1,14 @@
-name: Fetch upstream forks
+name: Sync Forks
 on:
   workflow_dispatch:
   schedule:
     - cron:  '0 20 * * *'
 jobs:
-  merge:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Merge upstream
+      - name: Fetch upstream
         run: |
           git config --global user.name 'songee2020'
           # git config --global user.email '21kixc@gmail.com'
@@ -20,9 +20,12 @@ jobs:
           git remote add upstream https://github.com/ACL4SSR/ACL4SSR.git
           git remote -v
           git status
-          git fetch upstream && git reset --hard origin/master && git clean -f -d
-          # Neither forget the -b opt,
-          # the feature/x ref is ambiguous at this stage
-          git checkout master
+          git fetch upstream
+      - name: Reset origin
+        run: |
+          git reset --hard origin/master
+          git clean -f -d
+      - name: Merge upstream
+        run: |
           git merge --no-edit upstream/master
           git push origin master
